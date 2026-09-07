@@ -83,7 +83,7 @@ void TWuppertalSmear<FImpl>::setup(void)
 template <typename FImpl>
 void TWuppertalSmear<FImpl>::execute(void)
 {
-    LOG(Message) << "Wuppertal Smearing starting..." << std::endl;
+    LOG(Message) << "Wuppertal Smearing starts." << std::endl;
     auto &out = envGet(PropagatorField, getName());
     auto &src = envGet(PropagatorField, par().source);
     auto &U = envGet(GaugeField, par().gauge);
@@ -92,12 +92,12 @@ void TWuppertalSmear<FImpl>::execute(void)
     {
        Umu.at(mu)=peekLorentz(U,mu);
     }
-    WuppertalSmearing<FImpl> wupsmear;
+    CovariantSmearing<FImpl> covsmear;
     out=src;
     startTimer("Wuppertal iteration");
-    wupsmear.WuppertalSmear(Umu, out, par().step, par().iterations, par().orthog);
+    covsmear.WuppertalSmear(Umu, out, par().step, par().iterations, par().orthog);
     stopTimer("Wuppertal iteration");
-    LOG(Message) << "Wuppertal Smearing ending..." << std::endl;
+    LOG(Message) << "Wuppertal Smearing ends." << std::endl;
 }
 
 END_MODULE_NAMESPACE
