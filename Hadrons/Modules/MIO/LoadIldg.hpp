@@ -1,3 +1,29 @@
+/*
+ * LoadIldg.hpp, part of Hadrons (https://github.com/aportelli/Hadrons)
+ *
+ * Copyright (C) 2015 - 2026
+ *
+ * Author: Antonin Portelli <antonin.portelli@me.com>
+ * Author: Gaurav Ray <gsr95@pm.me>
+ *
+ * Hadrons is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Hadrons is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Hadrons.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See the full license in the file "LICENSE" in the top level distribution 
+ * directory.
+ */
+
+/*  END LEGAL */
 #ifndef Hadrons_MIO_LoadIldg_hpp_
 #define Hadrons_MIO_LoadIldg_hpp_
 
@@ -8,8 +34,13 @@
 BEGIN_HADRONS_NAMESPACE
 
 /******************************************************************************
- *                         LoadIldg                                 *
+ Load an ILDG configuration
+
+ fileStem      Namestem of the file to read in 
+ waitForSave   Set to true if Hadrons needs to wait for a module 
+               with the same <filestem> to write cfg to disk
  ******************************************************************************/
+
 BEGIN_MODULE_NAMESPACE(MIO)
 
 class LoadIldgPar: Serializable

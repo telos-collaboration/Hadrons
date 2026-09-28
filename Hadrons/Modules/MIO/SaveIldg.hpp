@@ -1,7 +1,7 @@
 /*
  * SaveIldg.hpp, part of Hadrons (https://github.com/aportelli/Hadrons)
  *
- * Copyright (C) 2015 - 2023
+ * Copyright (C) 2015 - 2026
  *
  * Author: Antonin Portelli <antonin.portelli@me.com>
  * Author: Fabian Joswig <fabian.joswig@wwu.de>
@@ -42,11 +42,10 @@ BEGIN_HADRONS_NAMESPACE
  fileStem      Namestem of the file to write the gauge field to
  ensembleLabel Label of the ensemble. Recommended this is gauge info.
  ensembleId    Collaboration Name
- gaugeGroup    type of field - either SU or Sp
+ gaugeGroup    type of field - either su or sp
  reducedFormat save gauge field in reduced or full format
  precision     save gauge field in single or double precision
  ******************************************************************************/
-
 
 BEGIN_MODULE_NAMESPACE(MIO)
 
