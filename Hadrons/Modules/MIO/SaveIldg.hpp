@@ -6,6 +6,7 @@
  * Author: Antonin Portelli <antonin.portelli@me.com>
  * Author: Fabian Joswig <fabian.joswig@wwu.de>
  * Author: Michael Marshall <43034299+mmphys@users.noreply.github.com>
+ * Author: Gaurav Ray <gsr95@pm.me>
  *
  * Hadrons is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,13 +97,13 @@ TSaveIldg<GImpl>::TSaveIldg(const std::string name)
 template <typename GImpl>
 std::vector<std::string> TSaveIldg<GImpl>::getInput(void)
 {
-  return { par().gauge };
+    return { par().gauge };
 }
 
 template <typename GImpl>
 std::vector<std::string> TSaveIldg<GImpl>::getOutput(void)
 {
-    return {};
+    return { par().fileStem };
 }
 
 // setup ///////////////////////////////////////////////////////////////////////
@@ -139,7 +140,10 @@ void TSaveIldg<GImpl>::execute(void)
                 _IldgWriter.writeConfiguration<stats,GroupName::SU,MatrixFormat::FULL,FloatingPointFormat::IEEE64BIG>(U, vm().getTrajectory(), par().ensembleId, par().ensembleLabel);
             }
         }
-    } else if( par().gaugeGroup == "sp" ) {
+    } 
+
+#if Sp2n_config == 1
+    if( par().gaugeGroup == "sp" ) {
         if( par().precision == "single" ) {
             if( par().reducedFormat ) {
                 _IldgWriter.writeConfiguration<stats,GroupName::Sp,MatrixFormat::REDUCED,FloatingPointFormat::IEEE32BIG>(U, vm().getTrajectory(), par().ensembleId, par().ensembleLabel);
@@ -154,6 +158,7 @@ void TSaveIldg<GImpl>::execute(void)
             }
         }
     }
+#endif
 
     _IldgWriter.close();
 }
