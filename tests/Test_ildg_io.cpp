@@ -1,9 +1,10 @@
 /*
  * Test_field_io.cpp, part of Hadrons (https://github.com/aportelli/Hadrons)
  *
- * Copyright (C) 2015 - 2023
+ * Copyright (C) 2015 - 2026
  *
  * Author: Antonin Portelli <antonin.portelli@me.com>
+ * Author: Gaurav Ray       <gsr95@pm.me>
  *
  * Hadrons is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +30,37 @@
 using namespace Grid;
 using namespace Hadrons;
 
+/*
+    This test demonstrates the functionality of
+    the ILDG IO modules in Hadrons.
+
+    It does 4 things:
+      1) Generates a cfg using MGauge::Unit/Random
+      2) Saves to disk that cfg using MIO::SaveIldg
+      3) Loads the saved cfg back using MIO::LoadIldg
+      4) Performs a computation on the loaded cfg
+         using MGradientFlow::WilsonFlow
+
+    Except for the inclusion of steps 2 and 3 in the
+    same programme, this layout is intended to parallel the
+    layout of a typical Hadrons application.
+
+    MIO::SaveIldgPar::gauge is a string that should
+    match the output string of the Module producing 
+    the cfg that is to be saved to disk.
+
+    MIO::SaveIldgPar::gaugeGroup is a string that can
+    only be either su or sp. Take care when setting this
+    because if set incorrectly saved fields can be corrupted
+    and data irretrievably lost.
+
+    MIO::LoadIldgPar::waitForSave is a bool that lets
+    MIO::LoadIldg know whether it needs to wait for
+    the cfg to be saved to disk before attempting to load
+    it into memory. It should be set to false if the
+    cfgs are already on disk.
+*/
+
 int main(int argc, char *argv[])
 {
     // initialization //////////////////////////////////////////////////////////
@@ -40,67 +72,85 @@ int main(int argc, char *argv[])
     HadronsLogDebug.Active(GridLogDebug.isActive());
     LOG(Message) << "Grid initialized" << std::endl;
 
-    Application appSaveConfigs, appLoadConfigs;
+    Application application;
 
-    Application::GlobalPar globalPar; 
-    MIO::SaveIldgPar       saveIldgPar;
-    MIO::LoadIldgPar       loadIldgPar;
+    Application::GlobalPar          globalPar; 
+    MIO::SaveIldgPar                saveIldgPar;
+    MIO::LoadIldgPar                loadIldgPar;
+    MGradientFlow::WilsonFlow::Par  gfPar;
 
-    globalPar.runId = "saveIldg";
+    globalPar.runId             = "TEST_ILDG_IO";
     globalPar.trajCounter.start = 1;
     globalPar.trajCounter.end   = 2;
     globalPar.trajCounter.step  = 1;
 
-    appSaveConfigs.setPar(globalPar);
+    application.setPar(globalPar);
 
-    // generate random SU(Nc) cfgs
-    appSaveConfigs.createModule<MGauge::Random>("lattice");
+    std::vector<std::string> groups = {"su"};  // only su and sp valid
 
-    // save cfgs in different formats
-    saveIldgPar.gauge         = "lattice";          // name of gauge field
-    saveIldgPar.ensembleId    = "telos";            // collaboration label
-    saveIldgPar.ensembleLabel = "su" + std::to_string(Nc) + "unit_gauge";
-    saveIldgPar.gaugeGroup    = "su";
+    // generate cfgs
+    application.createModule<MGauge::Random>("su-test-cfg"); // SU(Nc)
 
-    saveIldgPar.fileStem      = "ildg_full_double";     // stem of filename
-    saveIldgPar.precision     = "double";
-    saveIldgPar.reducedFormat = false;
-    appSaveConfigs.createModule<MIO::SaveIldg>("save-lat-full-double", saveIldgPar);
+#if Sp2n_config == 1
+    application.createModule<MGauge::Unit>("sp-test-cfg");
+    groups.push_back("sp");
+#endif 
 
-    saveIldgPar.fileStem      = "ildg_full_single";     // stem of filename
-    saveIldgPar.precision     = "single";
-    saveIldgPar.reducedFormat = false;
-    appSaveConfigs.createModule<MIO::SaveIldg>("save-lat-full-single", saveIldgPar);
+    // demonstrate a save-load-measure workflow
+    for(auto &g: groups) {
+      saveIldgPar.gauge         = g + "-test-cfg";    // name of gauge field
+      saveIldgPar.ensembleId    = "telos";
+      saveIldgPar.ensembleLabel = g + std::to_string(Nc) + "hadrons_test";
+      saveIldgPar.gaugeGroup    = g;
 
-    saveIldgPar.fileStem      = "ildg_red_double";     // stem of filename
-    saveIldgPar.precision     = "double";
-    saveIldgPar.reducedFormat = true;
-    appSaveConfigs.createModule<MIO::SaveIldg>("save-lat-reduced-double", saveIldgPar);
+      saveIldgPar.precision     = "double";
+      saveIldgPar.reducedFormat = false;
+      saveIldgPar.fileStem      = g+"_full_double";
+      // save
+      application.createModule<MIO::SaveIldg>("save-"+g+"-full-double", saveIldgPar);
 
-    saveIldgPar.fileStem      = "ildg_red_single";     // stem of filename
-    saveIldgPar.precision     = "single";
-    saveIldgPar.reducedFormat = true;
-    appSaveConfigs.createModule<MIO::SaveIldg>("save-lat-reduced-single", saveIldgPar);
-    
-    appSaveConfigs.run();
+      loadIldgPar.fileStem    = saveIldgPar.fileStem;
+      loadIldgPar.waitForSave = true;
+      // load
+      application.createModule<MIO::LoadIldg>("load-"+g+"-full-double", loadIldgPar);
 
-    // read the cfgs back
-    globalPar.runId = "loadIldg";
-    appLoadConfigs.setPar(globalPar);
-  
-    loadIldgPar.fileStem = "ildg_full_double";
-    appLoadConfigs.createModule<MIO::LoadIldg>("load-lat-full-double", loadIldgPar);
+      // gfPar.gauge must match the name of the 
+      // corresponding LoadIldg module
+      gfPar.gauge         = "load-"+g+"-full-double";
+      gfPar.steps         = 6;
+      gfPar.step_size     = 0.01;
+      gfPar.meas_interval = 2;
+      // measure
+      application.createModule<MGradientFlow::WilsonFlow>(g+"-wilson-flow",gfPar);
 
-    loadIldgPar.fileStem = "ildg_full_single";
-    appLoadConfigs.createModule<MIO::LoadIldg>("load-lat-full-single", loadIldgPar);
+      // demonstrate 3 other write/read combinations
+      // that Grid's IldgWriter/Reader can handle
+      saveIldgPar.precision     = "single";
+      saveIldgPar.reducedFormat = false;
+      saveIldgPar.fileStem      = g+"_full_single";
+      application.createModule<MIO::SaveIldg>("save-"+g+"-full-single", saveIldgPar);
 
-    loadIldgPar.fileStem = "ildg_red_double";
-    appLoadConfigs.createModule<MIO::LoadIldg>("load-lat-reduced-double", loadIldgPar);
+      loadIldgPar.fileStem      = saveIldgPar.fileStem;
+      application.createModule<MIO::LoadIldg>("load-"+g+"-full-single", loadIldgPar);
 
-    loadIldgPar.fileStem = "ildg_red_single";
-    appLoadConfigs.createModule<MIO::LoadIldg>("load-lat-reduced-single", loadIldgPar);
+      saveIldgPar.precision     = "double";
+      saveIldgPar.reducedFormat = true;
+      saveIldgPar.fileStem      = g+"_red_double";
+      application.createModule<MIO::SaveIldg>("save-"+g+"-reduced-double", saveIldgPar);
 
-    appLoadConfigs.run();
+      loadIldgPar.fileStem      = saveIldgPar.fileStem;
+      application.createModule<MIO::LoadIldg>("load-"+g+"-reduced-double", loadIldgPar);
+
+      saveIldgPar.precision     = "single";
+      saveIldgPar.fileStem      = g+"_red_single";
+      application.createModule<MIO::SaveIldg>("save-"+g+"-reduced-single", saveIldgPar);
+
+      loadIldgPar.fileStem      = saveIldgPar.fileStem;
+      application.createModule<MIO::LoadIldg>("load-"+g+"-reduced-single", loadIldgPar);
+
+    }
+
+    application.run();
 
     Grid_finalize();
     
