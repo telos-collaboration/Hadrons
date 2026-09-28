@@ -16,7 +16,8 @@ class LoadIldgPar: Serializable
 {
 public:
     GRID_SERIALIZABLE_CLASS_MEMBERS(LoadIldgPar,
-                                    std::string, fileStem);
+                                    std::string, fileStem,
+                                    bool,        waitForSave);
 };
 
 template <typename FImpl>
@@ -52,7 +53,13 @@ template <typename FImpl>
 std::vector<std::string> TLoadIldg<FImpl>::getInput(void)
 {
     std::vector<std::string> in;
-    
+
+    // if cfg not already on disk a MIO::SaveIldg module must first write it
+    if( par().waitForSave )
+    {
+        in = {par().fileStem};
+    }
+
     return in;
 }
 
@@ -60,7 +67,6 @@ template <typename FImpl>
 std::vector<std::string> TLoadIldg<FImpl>::getOutput(void)
 {
     std::vector<std::string> out = {getName()};
-    
     return out;
 }
 
