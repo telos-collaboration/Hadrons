@@ -98,7 +98,10 @@ template <typename GImpl> void TAPE_Smearing<GImpl>::execute(void) {
       4.; // alpha/(2*(Nd_smear - 1)) where Nd_smear is the number of dimensions
           // that the field is being smeared in. For eg., for spatial
           // smearing, Nd_smear = 3 after excluding temporal dimension
-  std::vector<double> rho = {0, a, a, 0, a, 0, a, 0, a, a, 0, 0, 0, 0, 0, 0};
+  std::vector<double> rho = {0, a, a, 0, 
+                             a, 0, a, 0, 
+                             a, a, 0, 0, 
+                             0, 0, 0, 0};
 
   Smear_APE<GImpl> smearer(rho);
 
