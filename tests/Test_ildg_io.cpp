@@ -110,8 +110,7 @@ int main(int argc, char *argv[])
       application.createModule<MIO::SaveIldg>("save-"+g+"-full-double", saveIldgPar);
 
       loadIldgPar.file      = saveIldgPar.fileStem;
-      loadIldgPar.cfgOnDisk = false;  // true if uninitialised or set to any
-                                      // non-empty string or non-zero integer.
+      loadIldgPar.cfgOnDisk = false;  // true if uninitialised
       // load
       application.createModule<MIO::LoadIldg>("load-"+g+"-full-double", loadIldgPar);
 
