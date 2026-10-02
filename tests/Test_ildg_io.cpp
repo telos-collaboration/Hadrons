@@ -54,11 +54,11 @@ using namespace Hadrons;
     because if set incorrectly saved fields can be corrupted
     and data irretrievably lost.
 
-    MIO::LoadIldgPar::waitForSave is a bool that lets
+    MIO::LoadIldgPar::cfgOnDisk is a bool that lets
     MIO::LoadIldg know whether it needs to wait for
     the cfg to be saved to disk before attempting to load
-    it into memory. It should be set to false if the
-    cfgs are already on disk.
+    it into memory. If not set it is true and Hadrons will
+    expect the cfgs to already be on disk.
 */
 
 int main(int argc, char *argv[])
@@ -109,8 +109,9 @@ int main(int argc, char *argv[])
       // save
       application.createModule<MIO::SaveIldg>("save-"+g+"-full-double", saveIldgPar);
 
-      loadIldgPar.file    = saveIldgPar.fileStem;
-      loadIldgPar.waitForSave = true;
+      loadIldgPar.file      = saveIldgPar.fileStem;
+      loadIldgPar.cfgOnDisk = false;  // true if uninitialised or set to any
+                                      // non-empty string or non-zero integer.
       // load
       application.createModule<MIO::LoadIldg>("load-"+g+"-full-double", loadIldgPar);
 
