@@ -36,8 +36,8 @@ BEGIN_HADRONS_NAMESPACE
 /******************************************************************************
  Load an ILDG configuration
 
- fileStem      Namestem of the file to read in 
- waitForSave   Set to true if Hadrons needs to wait for a module 
+ file          Namestem of the file to read in
+ waitForSave   Set to true if Hadrons needs to wait for a module
                with the same <filestem> to write cfg to disk
  ******************************************************************************/
 
@@ -47,7 +47,7 @@ class LoadIldgPar: Serializable
 {
 public:
     GRID_SERIALIZABLE_CLASS_MEMBERS(LoadIldgPar,
-                                    std::string, fileStem,
+                                    std::string, file,
                                     bool,        waitForSave);
 };
 
@@ -88,7 +88,7 @@ std::vector<std::string> TLoadIldg<FImpl>::getInput(void)
     // if cfg not already on disk a MIO::SaveIldg module must first write it
     if( par().waitForSave )
     {
-        in = {par().fileStem};
+        in = {par().file};
     }
 
     return in;
@@ -113,7 +113,7 @@ template <typename FImpl>
 void TLoadIldg<FImpl>::execute(void)
 {
     FieldMetaData header;
-    std::string   fileName = par().fileStem + "."
+    std::string   fileName = par().file + "."
                              + std::to_string(vm().getTrajectory());
     LOG(Message) << "Loading ILDG gauge field from file '" << fileName
                  << "'" << std::endl;

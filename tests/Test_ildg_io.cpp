@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
       // save
       application.createModule<MIO::SaveIldg>("save-"+g+"-full-double", saveIldgPar);
 
-      loadIldgPar.fileStem    = saveIldgPar.fileStem;
+      loadIldgPar.file    = saveIldgPar.fileStem;
       loadIldgPar.waitForSave = true;
       // load
       application.createModule<MIO::LoadIldg>("load-"+g+"-full-double", loadIldgPar);
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
       saveIldgPar.fileStem      = g+"_full_single";
       application.createModule<MIO::SaveIldg>("save-"+g+"-full-single", saveIldgPar);
 
-      loadIldgPar.fileStem      = saveIldgPar.fileStem;
+      loadIldgPar.file      = saveIldgPar.fileStem;
       application.createModule<MIO::LoadIldg>("load-"+g+"-full-single", loadIldgPar);
 
       saveIldgPar.precision     = "double";
@@ -138,14 +138,14 @@ int main(int argc, char *argv[])
       saveIldgPar.fileStem      = g+"_red_double";
       application.createModule<MIO::SaveIldg>("save-"+g+"-reduced-double", saveIldgPar);
 
-      loadIldgPar.fileStem      = saveIldgPar.fileStem;
+      loadIldgPar.file      = saveIldgPar.fileStem;
       application.createModule<MIO::LoadIldg>("load-"+g+"-reduced-double", loadIldgPar);
 
       saveIldgPar.precision     = "single";
       saveIldgPar.fileStem      = g+"_red_single";
       application.createModule<MIO::SaveIldg>("save-"+g+"-reduced-single", saveIldgPar);
 
-      loadIldgPar.fileStem      = saveIldgPar.fileStem;
+      loadIldgPar.file      = saveIldgPar.fileStem;
       application.createModule<MIO::LoadIldg>("load-"+g+"-reduced-single", loadIldgPar);
 
     }
