@@ -38,7 +38,7 @@ BEGIN_HADRONS_NAMESPACE
 
  file          Namestem of the file to read in
  cfgOnDisk     Set to false if Hadrons needs to wait for a module
-               with the same fileStem to write cfg to disk
+               with the same fileStem to write a cfg to disk
  ******************************************************************************/
 
 BEGIN_MODULE_NAMESPACE(MIO)
@@ -49,6 +49,7 @@ public:
     GRID_SERIALIZABLE_CLASS_MEMBERS(LoadIldgPar,
                                     std::string, file,
                                     bool,        cfgOnDisk);
+    LoadIldgPar() : cfgOnDisk(true) {}
 };
 
 template <typename FImpl>
