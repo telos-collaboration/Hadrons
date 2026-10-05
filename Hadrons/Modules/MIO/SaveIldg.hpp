@@ -60,6 +60,7 @@ public:
                                     std::string, gaugeGroup,
                                     bool,        reducedFormat,
                                     std::string, precision);
+    SaveIldgPar() : reducedFormat(false), precision("double") {}
 };
 
 template <typename GImpl>
@@ -115,8 +116,13 @@ void TSaveIldg<GImpl>::setup(void)
 template <typename GImpl>
 void TSaveIldg<GImpl>::execute(void)
 {
+    if( par().gaugeGroup != "su" && par().gaugeGroup != "sp" )
+    {
+        HADRONS_ERROR(Argument, "SaveIldgPar::gaugeGroup must be either 'su' or 'sp'.");
+    }
+
     std::string fileName = par().fileStem + "." + std::to_string(vm().getTrajectory());
-    LOG(Message) << "DEBUG:: Saving ILDG configuration to file '" << fileName
+    LOG(Message) << "Saving ILDG configuration to file '" << fileName
                  << "'" << std::endl;
 
     auto &U = envGet(GaugeField, par().gauge);
