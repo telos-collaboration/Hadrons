@@ -103,14 +103,14 @@ int main(int argc, char *argv[])
       saveIldgPar.ensembleLabel = g + std::to_string(Nc) + "hadrons_test";
       saveIldgPar.gaugeGroup    = g;
 
-      saveIldgPar.precision     = "double";
-      saveIldgPar.reducedFormat = false;
+      saveIldgPar.precision     = "double"; // default value
+      saveIldgPar.reducedFormat = false;    // default value
       saveIldgPar.fileStem      = g+"_full_double";
       // save
       application.createModule<MIO::SaveIldg>("save-"+g+"-full-double", saveIldgPar);
 
       loadIldgPar.file      = saveIldgPar.fileStem;
-      loadIldgPar.cfgOnDisk = false;  // true if uninitialised
+      loadIldgPar.cfgOnDisk = false;        // true by default
       // load
       application.createModule<MIO::LoadIldg>("load-"+g+"-full-double", loadIldgPar);
 
