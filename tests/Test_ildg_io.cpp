@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
       application.createModule<MIO::SaveIldg>("save-"+g+"-full-double", saveIldgPar);
 
       loadIldgPar.file        = saveIldgPar.fileStem;
-      loadIldgPar.waitForSave = "NO";        // don't set if cfg already on disk
+      loadIldgPar.waitForSave = "Y";        // don't set if cfg already on disk
       // load
       application.createModule<MIO::LoadIldg>("load-"+g+"-full-double", loadIldgPar);
 
