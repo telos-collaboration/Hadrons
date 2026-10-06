@@ -37,7 +37,7 @@ BEGIN_HADRONS_NAMESPACE
  Load an ILDG configuration
 
  file          Namestem of the file to read in
- cfgOnDisk     Set to false if Hadrons needs to wait for a module
+ waitForSave   Non-empty string if Hadrons needs to wait for a module
                with the same fileStem to write a cfg to disk
  ******************************************************************************/
 
@@ -48,8 +48,7 @@ class LoadIldgPar: Serializable
 public:
     GRID_SERIALIZABLE_CLASS_MEMBERS(LoadIldgPar,
                                     std::string, file,
-                                    bool,        cfgOnDisk);
-    LoadIldgPar() : cfgOnDisk(true) {}
+                                    std::string, waitForSave);
 };
 
 template <typename FImpl>
@@ -87,7 +86,7 @@ std::vector<std::string> TLoadIldg<FImpl>::getInput(void)
     std::vector<std::string> in;
 
     // if cfg not already on disk a MIO::SaveIldg module must first write it
-    if( !par().cfgOnDisk )
+    if( !par().waitForSave.empty() )
     {
         in = {par().file};
     }
