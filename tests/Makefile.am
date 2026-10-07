@@ -11,6 +11,7 @@ EXTRA_PROGRAMS = \
   Test_exact_distil         \
   Test_fermion_flow			\
   Test_field_io             \
+  Test_ildg_io              \
   Test_free_prop            \
   Test_gradient_flow		\
   Test_hadrons_meson_3pt    \
@@ -51,6 +52,9 @@ Test_fermion_flow_LDADD=-lHadrons -lGrid
 
 Test_field_io_SOURCES=Test_field_io.cpp
 Test_field_io_LDADD=-lHadrons -lGrid
+
+Test_ildg_io_SOURCES=Test_ildg_io.cpp
+Test_ildg_io_LDADD=-lHadrons -lGrid
 
 Test_free_prop_SOURCES=Test_free_prop.cpp
 Test_free_prop_LDADD=-lHadrons -lGrid
